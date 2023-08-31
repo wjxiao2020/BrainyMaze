@@ -1,0 +1,112 @@
+html, body {
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    background-color: rgb(186, 204, 217);
+    background-size: cover
+}
+
+#game_intro {
+    width: 100%;
+    margin: 0;
+    background-color: rgb(216, 227, 231);
+}
+
+#game_title {
+    /*background-color: rgb(216, 227, 231);*/
+    margin: 0;
+    padding-top: 20px;
+    text-align: center;
+}
+
+#game_description {
+    text-align: center;
+    padding-bottom: 10px;
+    font-size: 18px;
+}
+
+#selection_area {
+    width: max-content;
+    margin: auto;
+    font-size: 18px;
+}
+
+button {
+    cursor: pointer;
+    background-color: white;
+}
+
+button:hover {
+    background-color: rgba(242, 202, 201, 0.5);
+}
+
+#selection_area button {
+    font-size: 13px;
+    margin-left: 25px;
+}
+
+#game_space {
+    position: relative;
+    margin: 30px auto 0px auto;
+    width: max-content;
+}
+
+#maze {
+    width: max-content;
+}
+
+#algorithms {
+    position: absolute;
+    top: 0px;
+    left: 110%;
+}
+
+#algorithms button {
+    font-size: 15px;
+    width: 170px;
+    margin-bottom: 10px;
+}
+
+.maze_row {
+    display: flex;
+}
+
+.maze_cell {
+    background-color: white;
+    border: solid 1px transparent;
+}
+
+.left_wall {
+    border-left: solid 1px black;
+}
+
+.right_wall {
+    border-right: solid 1px black;
+}
+
+.top_wall {
+    border-top: solid 1px black;
+}
+
+.bottom_wall {
+    border-bottom: solid 1px black;
+}
+
+.searched {
+    background-color: cornflowerblue;
+}
+
+.in_solution {
+    background-color: lightcoral;
+}
+
+.entrance_exit_cell {
+    background-color: lightcoral;
+}
+
+footer {
+    margin-top: 50px;
+    text-align: center;
+}

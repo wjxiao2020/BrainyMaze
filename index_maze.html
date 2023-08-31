@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Brainy Maze</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.min.js"></script>
+</head>
+<body>
+<div id="game_intro">
+<h1 id="game_title">Brainy Maze</h1>
+<p id="game_description">
+    Play with <b>↑ ← ↓ →</b> or <b>W A S D</b> keys to beat the maze! <br>
+    OR click on the buttons to see how search algorithms plays it!
+</p>
+</div>
+
+<div id="main">
+    <div id="selection_area">
+        Rows:
+        <select v-model="rowNum" @change="reset">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+            <option value="50">50</option>
+        </select>
+        &emsp;
+        Columns:
+        <select v-model="columnNum" @change="reset">
+            <option value="5">5</option>
+            <option value="10">10</option>
+            <option value="20">20</option>
+            <option value="30">30</option>
+            <option value="40">40</option>
+            <option value="50">50</option>
+        </select>
+        <button @click="reset">New Maze</button>
+    </div>
+    <div id="game_space">
+        <div id="maze">
+            <div class="maze_row" v-for="row in parseInt(rowNum)">
+                <div class="maze_cell" v-for="column in parseInt(columnNum)"
+                     :ref="`cell${row}_${column}`"
+                     :style="{width: cellSize + 'px', height: cellSize + 'px'}"
+                     :class = "{left_wall : hasLeftWall(row, column),
+                                right_wall: hasRightWall(row, column),
+                                top_wall : hasTopWall(row, column),
+                                bottom_wall: hasBottomWall(row, column),
+                                searched: cellSearched(row, column),
+                                in_solution: cellInSolution(row, column)}">
+                </div>
+            </div>
+        </div>
+        <div id="algorithms">
+            <button @click="depthFirstSearch">Depth-First Search</button>
+            <button @click="breadthFirstSearch">Breadth-First Search</button>
+        </div>
+    </div>
+</div>
+
+<footer>©2023 Weijia Xiao. All rights reserved.</footer>
+
+<script language="JavaScript" src="game.js"></script>
+</body>
+</html>
