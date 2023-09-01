@@ -16,7 +16,7 @@ var maze = new Vue({
     created(){
         this.selectPaths();
         this.initializeSearchMap();
-        window.addEventListener('keydown', (event)=>{this.keyPressHandler(event)});
+        window.addEventListener('keydown', (event)=>{this.keyPressHandler(event.key)});
     },
     mounted() {
         this.$refs['cell1_1'][0].style.backgroundColor = "lightcoral";
@@ -311,7 +311,7 @@ var maze = new Vue({
         },
 
         // handles a key press
-        keyPressHandler: function(event) {
+        keyPressHandler: function(key) {
             if (this.mode != 3) {
                 this.initializeSearchMap();
                 this.initializeWorkList();
@@ -325,13 +325,13 @@ var maze = new Vue({
             let lastCell = this.workList[this.workList.length - 1];
             let lastCellIndex = lastCell.cell;
             let lastCellNeighbors = lastCell.neighbors;
-            if ((event.key == "ArrowUp" || event.key == "w") && lastCellNeighbors.top.connection) {
+            if ((key == "ArrowUp" || key == "w") && lastCellNeighbors.top.connection) {
                 let topNeighborIndex = lastCellIndex - parseInt(this.columnNum);
                 this.playerSearchHelper(lastCellIndex, topNeighborIndex);
-            } else if ((event.key == "ArrowLeft" || event.key == "a") && lastCellNeighbors.left.connection) {
+            } else if ((key == "ArrowLeft" || key == "a") && lastCellNeighbors.left.connection) {
                 let leftNeighborIndex = lastCellIndex - 1;
                 this.playerSearchHelper(lastCellIndex, leftNeighborIndex);
-            } else if ((event.key == "ArrowDown" || event.key == "s") && lastCellNeighbors.bottom.connection) {
+            } else if ((key == "ArrowDown" || key == "s") && lastCellNeighbors.bottom.connection) {
                 let bottomNeighborIndex = lastCellIndex + parseInt(this.columnNum);
                 this.playerSearchHelper(lastCellIndex, bottomNeighborIndex);
                 // the exit is reached!
@@ -340,7 +340,7 @@ var maze = new Vue({
                     this.backtrack(exitCellIndex);
                     this.mode = 0;
                 }
-            } else if ((event.key == "ArrowRight" || event.key == "d") && lastCellNeighbors.right.connection) {
+            } else if ((key == "ArrowRight" || key == "d") && lastCellNeighbors.right.connection) {
                 let rightNeighborIndex = lastCellIndex + 1;
                 this.playerSearchHelper(lastCellIndex, rightNeighborIndex);
                 // the exit is reached!

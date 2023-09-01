@@ -65,8 +65,37 @@ button:hover {
 
 #algorithms button {
     font-size: 15px;
-    width: 170px;
+    width: 180px;
     margin-bottom: 10px;
+}
+
+#arrow_keys {
+    position: absolute;
+    top: 0px;
+    width: max-content;
+    right: 110%;
+    text-align: center;
+}
+
+#arrow_keys button {
+    font-size: 18px;
+    font-weight: bold;
+}
+
+#arrow_left, #arrow_right{
+    display: inline-block;
+}
+
+#arrow_left {
+    margin-right: 50px;
+}
+
+#arrow_up {
+    margin-bottom: 10px;
+}
+
+#arrow_down {
+    margin-top: 10px;
 }
 
 .maze_row {

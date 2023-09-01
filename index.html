@@ -57,6 +57,14 @@
             <button @click="depthFirstSearch">Depth-First Search</button>
             <button @click="breadthFirstSearch">Breadth-First Search</button>
         </div>
+        <div id="arrow_keys">
+            <button id="arrow_up" @click="keyPressHandler('ArrowUp')">↑</button>
+            <div id="left_right_arrows">
+                <button id="arrow_left" @click="keyPressHandler('ArrowLeft')">←</button>
+                <button id="arrow_right" @click="keyPressHandler('ArrowRight')">→</button>
+            </div>
+            <button id="arrow_down" @click="keyPressHandler('ArrowDown')">↓</button>
+        </div>
     </div>
 </div>
 
