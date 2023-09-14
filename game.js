@@ -356,7 +356,6 @@ var maze = new Vue({
 
         // uses A* Search Algorithm to find the way to the end cell
         aStarSearch: function(choice) {
-            console.log("aStarSearch");
             this.resetBeforeSearch();
             this.initManhattanDistMap();
             this.mode = 4;
@@ -370,11 +369,11 @@ var maze = new Vue({
                 let smallestDistIdx = smallestDistCell.cell;
                 let smallestDistCellCost;
                 if (choice == 1) {
-                    console.log("total cost used");
+                    // use the total Manhattan distance
                     smallestDistCellCost = this.manhattanDistanceMap[smallestDistIdx].costToArrive
                                                + this.manhattanDistanceMap[smallestDistIdx].costToExit;
                 } else {
-                    console.log("costToExit used");
+                    // use the Manhattan distance to the exit only
                     smallestDistCellCost = this.manhattanDistanceMap[smallestDistIdx].costToExit;
                 }
 
@@ -384,7 +383,6 @@ var maze = new Vue({
                     let currentCellIndex = currentCell.cell;
                     let currentCellCost;
                     if (choice == 1) {
-                        console.log("total cost used");
                         currentCellCost = this.manhattanDistanceMap[currentCellIndex].costToArrive
                                               + this.manhattanDistanceMap[currentCellIndex].costToExit;
                     } else {
