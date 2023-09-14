@@ -56,6 +56,9 @@
         <div id="algorithms">
             <button @click="depthFirstSearch">Depth-First Search</button>
             <button @click="breadthFirstSearch">Breadth-First Search</button>
+            <button @click="aStarSearch(1)">A* Search - 1</button>
+            <button @click="aStarSearch(2)">A* Search - 2</button>
+            <br>
         </div>
         <div id="arrow_keys">
             <button id="arrow_up" @click="keyPressHandler('ArrowUp')">↑</button>
@@ -66,6 +69,13 @@
             <button id="arrow_down" @click="keyPressHandler('ArrowDown')">↓</button>
         </div>
     </div>
+
+    <p id="note">
+        NOTE: <br>
+        A* Search - 1 : uses <b>total Manhattan distance</b> (distance traveled to arrive this cell + distance to the exit)
+        as its approximation heuristics <br>
+        A* Search - 2 : uses the <b>Manhattan distance to the exit only</b> as its approximation heuristics
+    </p>
 </div>
 
 <footer>©2023 Weijia Xiao. All rights reserved.</footer>

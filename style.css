@@ -60,7 +60,8 @@ button:hover {
 #algorithms {
     position: absolute;
     top: 0px;
-    left: 110%;
+    left: 100%;
+    margin-left: 70px;
 }
 
 #algorithms button {
@@ -73,7 +74,8 @@ button:hover {
     position: absolute;
     top: 0px;
     width: max-content;
-    right: 110%;
+    right: 100%;
+    margin-right: 70px;
     text-align: center;
 }
 
@@ -133,6 +135,12 @@ button:hover {
 
 .entrance_exit_cell {
     background-color: lightcoral;
+}
+
+#note {
+    /*border: slateblue 1px solid;*/
+    width: max-content;
+    margin: 100px auto 0px auto;
 }
 
 footer {

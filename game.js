@@ -3,14 +3,17 @@ var maze = new Vue({
     data: {
         rowNum: 20,
         columnNum: 20,
-        // used for search algorithms
+        // used for search algorithms,
+        // contains objects: {cell: index, neighbors: {left: {neighborIndex:..., connection:...}...}}
         workList: [],
         // records whether each cell is already been searched(true) or not (false), and if it is in solution path
         searchMap: [],
         // records paths that have taken during the search for the exit so that when maze is complete,
         // we are able to backtrack the correct way to reach from the entrance to the exit
         pathsSearched: [],
-        // 0 represents not in search mode, 1 represents DFS, 2 represents BFS, 3 represents player is playing the maze
+        manhattanDistanceMap: [],
+        // 0: not in any search mode, 1: DFS, 2: BFS, 3: player is manually playing the maze
+        // 4: A* search
         mode: 0
     },
     created(){
@@ -194,9 +197,7 @@ var maze = new Vue({
 
         // solves the game using Depth-First Search algorithm
         depthFirstSearch: function() {
-            this.initializeWorkList();
-            this.initializeSearchMap();
-            this.pathsSearched = [];
+            this.resetBeforeSearch();
             this.mode = 1;
             this.searchHelper();
 
@@ -204,16 +205,14 @@ var maze = new Vue({
 
         // solves the game using Breadth-First Search algorithm
         breadthFirstSearch: function() {
-            this.initializeWorkList();
-            this.initializeSearchMap();
-            this.pathsSearched = [];
+            this.resetBeforeSearch();
             this.mode = 2;
             this.searchHelper();
         },
 
         // search helper function for Depth-First Search and Breadth-First Search
         searchHelper: function() {
-            if (this.workList.length > 0 && this.mode != 0) {
+            if (this.workList.length > 0 && (this.mode == 1 || this.mode == 2)) {
                 let currentCell;
                 if (this.mode == 1) {
                     currentCell = this.workList.pop();
@@ -223,15 +222,8 @@ var maze = new Vue({
 
                 let currentCellIndex = currentCell.cell;
 
-                // algorithms have found the exit!!
-                let exitCellIndex = this.mazeSize - 1;
-                if (currentCellIndex == exitCellIndex) {
-                    this.mode = 0;
-                    this.searchMap[currentCellIndex].inSolution = true;
-                    this.backtrack(exitCellIndex);
-                }
-                // this cell haven't been searched yet
-                else if (!this.searchMap[currentCellIndex].searched) {
+                // algorithms have not found the exit and this cell haven't been searched yet
+                if (!this.ifFoundExit(currentCellIndex) && !this.searchMap[currentCellIndex].searched) {
                     let neighbors = currentCell.neighbors;
 
                     let left = neighbors.left;
@@ -246,11 +238,7 @@ var maze = new Vue({
                     let bottom = neighbors.bottom;
                     this.addToWorkList(currentCellIndex, bottom.neighborIndex, bottom.connection);
                 }
-                this.searchMap[currentCellIndex].searched = true;
-                // this.$forceUpdate();
-                let row = Math.floor(currentCellIndex / this.columnNum) + 1;
-                let column = currentCellIndex % this.columnNum + 1;
-                this.$refs['cell' + row + '_' + column][0].style.class = "searched";
+                this.markCellSearched(currentCellIndex);
                 setTimeout(()=>this.searchHelper(), 15);
             }
         },
@@ -270,11 +258,14 @@ var maze = new Vue({
         },
 
         // if the given index is not -1 then adds the cell with the given index to the work list
+        // returns whether the cell is added to the work list
         addToWorkList: function (currentCellIndex, neighborIndex, connection) {
             if (neighborIndex != -1 && connection) {
                 this.workList.push({cell: neighborIndex, neighbors: this.mazeCellMap[neighborIndex]});
                 this.pathsSearched.push({from: currentCellIndex, to: neighborIndex});
+                return true;
             }
+            return false;
         },
 
         // backtrack the correct way back from the exit to the entrance
@@ -313,10 +304,8 @@ var maze = new Vue({
         // handles a key press
         keyPressHandler: function(key) {
             if (this.mode != 3) {
-                this.initializeSearchMap();
-                this.initializeWorkList();
+                this.resetBeforeSearch();
                 this.searchMap[0].searched = true;
-                this.pathsSearched = [];
                 this.mode = 3;
             }
 
@@ -365,7 +354,131 @@ var maze = new Vue({
             }
         },
 
-        // resets the game
+        // uses A* Search Algorithm to find the way to the end cell
+        aStarSearch: function(choice) {
+            console.log("aStarSearch");
+            this.resetBeforeSearch();
+            this.initManhattanDistMap();
+            this.mode = 4;
+            this.aStarSearchHelper(choice);
+        },
+
+        // search helper function for A* Search Algorithm
+        aStarSearchHelper: function(choice) {
+            if (this.workList.length != 0 && this.mode == 4) {
+                let smallestDistCell = this.workList[0];
+                let smallestDistIdx = smallestDistCell.cell;
+                let smallestDistCellCost;
+                if (choice == 1) {
+                    console.log("total cost used");
+                    smallestDistCellCost = this.manhattanDistanceMap[smallestDistIdx].costToArrive
+                                               + this.manhattanDistanceMap[smallestDistIdx].costToExit;
+                } else {
+                    console.log("costToExit used");
+                    smallestDistCellCost = this.manhattanDistanceMap[smallestDistIdx].costToExit;
+                }
+
+                // find the cell in work list that has the least total cost
+                for (let i = 1; i < this.workList.length; i++) {
+                    let currentCell = this.workList[i];
+                    let currentCellIndex = currentCell.cell;
+                    let currentCellCost;
+                    if (choice == 1) {
+                        console.log("total cost used");
+                        currentCellCost = this.manhattanDistanceMap[currentCellIndex].costToArrive
+                                              + this.manhattanDistanceMap[currentCellIndex].costToExit;
+                    } else {
+                        currentCellCost = this.manhattanDistanceMap[currentCellIndex].costToExit;
+                    }
+                    if (currentCellCost < smallestDistCellCost) {
+                        smallestDistCell = currentCell
+                        smallestDistIdx = currentCellIndex;
+                        smallestDistCellCost = currentCellCost;
+                    }
+                }
+                this.workList.splice(this.workList.indexOf(smallestDistCell), 1);
+
+                // algorithms have not found the exit and this cell haven't been searched yet
+                if (!this.ifFoundExit(smallestDistIdx) && !this.searchMap[smallestDistIdx].searched) {
+                    let neighbors = this.mazeCellMap[smallestDistIdx];
+
+                    let left = neighbors.left;
+                    this.addToWorkListAStar(smallestDistIdx, left);
+
+                    let right = neighbors.right;
+                    this.addToWorkListAStar(smallestDistIdx, right);
+
+                    let top = neighbors.top;
+                    this.addToWorkListAStar(smallestDistIdx, top);
+
+                    let bottom = neighbors.bottom;
+                    this.addToWorkListAStar(smallestDistIdx, bottom);
+                }
+
+                this.markCellSearched(smallestDistIdx);
+                setTimeout(()=>this.aStarSearchHelper(choice), 15);
+            }
+        },
+
+        // adds the given cell to the work list for A* Search algorithm if it can be reached and
+        // the given way to reach that cell has less cost than before
+        addToWorkListAStar: function(currentCellIdx, neighborCell) {
+            if (neighborCell.neighborIndex != -1) {
+                let currentCellCostToArrive = this.manhattanDistanceMap[currentCellIdx].costToArrive;
+                let neighborCellCostToArrive = this.manhattanDistanceMap[neighborCell.neighborIndex].costToArrive;
+                if((neighborCellCostToArrive == -1 || neighborCellCostToArrive > currentCellCostToArrive + 1)
+                   && this.addToWorkList(currentCellIdx, neighborCell.neighborIndex, neighborCell.connection)) {
+                    this.manhattanDistanceMap[neighborCell.neighborIndex].costToArrive = currentCellCostToArrive + 1;
+                }
+            }
+        },
+
+        // initializes manhattanDistanceMap, records the manhattan distance cost of each cell,
+        // both cost to arrive that cell and estimated cost from that cell to the exit
+        initManhattanDistMap: function() {
+            this.manhattanDistanceMap = [];
+            for (let i = 0; i < this.rowNum; i++) {
+                for (let j = 0; j < this.columnNum; j++) {
+                    // all cells have an unknown cost to arrive(-1)
+                    this.manhattanDistanceMap.push({costToArrive: -1,
+                                                    costToExit: this.rowNum - i + this.columnNum - j - 2});
+                }
+            }
+            // the start cell is known to have a 0 cost to arrive
+            this.manhattanDistanceMap[0].costToArrive = 0;
+        },
+
+        // reset the maze back to empty before a new search method is applied
+        resetBeforeSearch: function() {
+            this.initializeWorkList();
+            this.initializeSearchMap();
+            this.pathsSearched = [];
+        },
+
+        // determines if the given cell is the exit cell of the maze, if so, backtrack and end the game then returns true
+        // if not, returns false
+        ifFoundExit: function(cellIndex) {
+            // algorithms have found the exit!!
+            let exitCellIndex = this.mazeSize - 1;
+            if (cellIndex == exitCellIndex) {
+                this.mode = 0;
+                this.searchMap[cellIndex].inSolution = true;
+                this.backtrack(exitCellIndex);
+                return true;
+            }
+            return false;
+        },
+
+        // mark the cell of the given cell index as searched
+        markCellSearched: function(cellIndex) {
+            this.searchMap[cellIndex].searched = true;
+            // this.$forceUpdate();
+            let row = Math.floor(cellIndex / this.columnNum) + 1;
+            let column = cellIndex % this.columnNum + 1;
+            this.$refs['cell' + row + '_' + column][0].style.class = "searched";
+        },
+
+        // resets the game (restart a new maze)
         reset: function() {
             this.resetMazeCellMap();
             this.selectPaths();
