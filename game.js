@@ -1,3 +1,12 @@
+// Avoid the web page scrolling up and down when user is using arrow keys to play the game.
+// Thanks for Zeta's answer in 
+// stackoverflow.com/questions/8916620/disable-arrow-key-scrolling-in-users-browser
+window.addEventListener("keydown", function(e) {
+    if(["Space","ArrowUp","ArrowDown","ArrowLeft","ArrowRight"].indexOf(e.code) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
 var maze = new Vue({
     el:"#main",
     data: {
